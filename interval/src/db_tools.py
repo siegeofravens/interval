@@ -159,6 +159,25 @@ def insert_track(conn, attributes):
         return False
 
 
+# For CS221 Project with Eric
+# First argument is a MySQL connection which can be obtained via:
+# conn = mysql.connector.connect(user=constants.USERNAME, password=constants.PASSWORD, host=constants.HOST, database=constants.DATABASE)
+# Remember to conn.close() when finished with the connection
+def get_current_track_ids(conn):
+    # Creating a cursor object using the cursor() method
+    cursor = conn.cursor()
+
+    # Execute the SQL query, one length tuple needs the comma (execute only takes tuples as second argument)
+    cursor.execute("SELECT TRACK_ID FROM 221_PROJECT")
+
+    # Should get list of length one tuples, each containing one track id
+    track_ids = cursor.fetchall()
+
+    # Convert list of tuples to list of just the strings
+    track_ids = [tup[0] for tup in track_ids]
+
+    return track_ids
+
 if __name__ == "__main__":
     flags = ['-get', '-add']
     if len(sys.argv) < 2 or sys.argv[1] not in flags:
