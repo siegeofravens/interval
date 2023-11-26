@@ -86,6 +86,10 @@ def update_user_songs(conn, email, top_ids):
     conn.commit()
 
 # Argument centroids is a 5-list of centroids
+# First argument is a MySQL connection which can be obtained via:
+# conn = mysql.connector.connect(user=constants.USERNAME, password=constants.PASSWORD, host=constants.HOST, database=constants.DATABASE)
+# Third argument is a string of form "id-id-id..."
+# Remember to conn.close() when finished with the connection
 def update_user_centroids(conn, email, centroids):
     # Creating a cursor object using the cursor() method
     cursor = conn.cursor()
@@ -105,6 +109,54 @@ def update_user_centroids(conn, email, centroids):
 
     # Commit changes
     conn.commit()
+
+# Argument attributes is given from Spotify API
+# First argument is a MySQL connection which can be obtained via:
+# conn = mysql.connector.connect(user=constants.USERNAME, password=constants.PASSWORD, host=constants.HOST, database=constants.DATABASE)
+# Remember to conn.close() when finished with the connection
+def insert_track(conn, attributes):
+    # Creating a cursor object using the cursor() method
+    cursor = conn.cursor()
+
+    """
+    Order of columns in table: 
+    TRACK_ID
+    TRACK_NAME
+    ARTIST_NAME
+    ACOUSTICNESS
+    DANCEABILITY
+    DURATION
+    ENERGY
+    INSTRUMENTALNESS
+    LIVENESS
+    LOUDNESS
+    MODE
+    SPEECHINESS
+    TEMPO
+    TIME_SIGNATURE
+    VALENCE
+    POPULARITY
+    """
+
+    insert_stmt = (
+    "INSERT INTO 221_PROJECT(TRACK_ID, TRACK_NAME, ARTIST_NAME, ACOUSTICNESS, DANCEABILITY, DURATION, ENERGY, INSTRUMENTALNESS, LIVENESS, LOUDNESS, MODE, SPEECHINESS, TEMPO, TIME_SIGNATURE, VALENCE, POPULARITY)"
+    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    )
+
+    data = (attributes['id'], attributes['track_name'], attributes['artist_name'], attributes['acousticness'], attributes['danceability'], attributes['duration'], attributes['energy'], attributes['instrumentalness'], attributes['liveness'], attributes['loudness'], attributes['mode'], attributes['speechiness'], attributes['tempo'], attributes['time_signature'], attributes['valence'], attributes['popularity'])
+
+    try:
+        # Executing the SQL command
+        cursor.execute(insert_stmt, data)
+    
+        # Commit your changes in the database
+        conn.commit()
+        return True
+
+    except:
+        # Rolling back in case of error
+        conn.rollback()
+        return False
 
 
 if __name__ == "__main__":
